@@ -16,6 +16,10 @@ const User = sequelize.define('User', {
   password: {
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  profile_image_path: {
+    type: DataTypes.STRING,  // Stelle sicher, dass dieser Typ korrekt ist
+    defaultValue: null       // Optional: Setze ein Standardbild
   }
 }, {
   tableName: 'user',  // Gibt den Tabellennamen explizit an

@@ -5,7 +5,14 @@ const bcrypt = require("bcrypt");
 const { StatusCodes } = require("http-status-codes");
 const jwt = require('jsonwebtoken');
 const { generateToken } = require('../../services/auth/AccessToken');
+const md5 = require('md5');
 
+// Funktion zum Generieren des Gravatar-Links
+const generateGravatarUrl = (email) => {
+  const lowercasedEmail = email.trim().toLowerCase();
+  const hash = md5(lowercasedEmail);
+  return `https://www.gravatar.com/avatar/${hash}?d=identicon`;
+};
 const AuthRouter = Router();
 
 
@@ -34,7 +41,6 @@ AuthRouter.post("/login", async (req, res) => {
 
 // Benutzerregistrierung
 AuthRouter.post("/register", async (req, res) => {
-  // Handle register logic
   try {
     const { email, password } = req.body;
 
@@ -49,6 +55,9 @@ AuthRouter.post("/register", async (req, res) => {
       });
     }
 
+    // Generiere den Gravatar-Link
+    const avatarUrl = generateGravatarUrl(email);
+
     // Falls nicht, hashen Sie das Passwort
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -56,6 +65,7 @@ AuthRouter.post("/register", async (req, res) => {
     const newUser = await Users.create({
       email: email,
       password: hashedPassword,
+      profile_image_path: avatarUrl // Füge den Gravatar-Link in die Datenbank ein
     });
 
     // Erfolgreiche Antwort senden
