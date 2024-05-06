@@ -1,5 +1,6 @@
 # Aufgabe 2: Logging
 ### Abgabe: Link zu dem Commit
+#### https://github.com/akocerke/JWToken-API/commit/ddfab529dd8adaf983cf69a0b6b36be40656854b
 #
 ### 2.1 Bindet den Logger winston anhand der Dokumentation ein✅
 #
