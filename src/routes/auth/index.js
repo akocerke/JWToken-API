@@ -6,6 +6,7 @@ const { StatusCodes } = require("http-status-codes");
 const jwt = require('jsonwebtoken');
 const { generateToken } = require('../../services/auth/AccessToken');
 const md5 = require('md5');
+const logger = require ("../../services/logger");
 
 // Funktion zum Generieren des Gravatar-Links
 const generateGravatarUrl = (email) => {
@@ -44,43 +45,33 @@ AuthRouter.post("/register", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Überprüfen, ob der Benutzer bereits vorhanden ist
     const existingUser = await Users.findOne({ where: { email: email } });
-
-    // Wenn der Benutzer bereits vorhanden ist, senden Sie eine Fehlermeldung an den Client
     if (existingUser) {
+      logger.warn(`Registrierungsversuch mit vorhandener E-Mail: ${email}`); // Warnung loggen
       return res.status(StatusCodes.BAD_REQUEST).json({
-        message:
-          "Benutzername bereits vergeben. Bitte wählen Sie einen anderen Benutzernamen.",
+        message: "Benutzername bereits vergeben. Bitte wählen Sie einen anderen Benutzernamen.",
       });
     }
 
-    // Generiere den Gravatar-Link
     const avatarUrl = generateGravatarUrl(email);
-
-    // Falls nicht, hashen Sie das Passwort
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Fügen Sie den neuen Benutzer zur Datenbank hinzu
     const newUser = await Users.create({
       email: email,
       password: hashedPassword,
-      profile_image_path: avatarUrl // Füge den Gravatar-Link in die Datenbank ein
+      profile_image_path: avatarUrl
     });
 
-    // Erfolgreiche Antwort senden
-    res
-      .status(StatusCodes.CREATED)
-      .json({ message: "Benutzer erfolgreich registriert.", user: newUser });
+    logger.info(`Neuer Benutzer registriert: ${email}, Bild-URL: ${avatarUrl}`); // Info Loggen
+
+    res.status(StatusCodes.CREATED).json({ message: "Benutzer erfolgreich registriert.", user: newUser }); 
   } catch (error) {
-    console.error("Fehler bei der Registrierung:", error);
+    logger.error(`Fehler bei der Registrierung: ${error.message}`); // Fehler loggen
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Fehler bei der Registrierung. Bitte versuchen Sie es erneut.",
     });
   }
 });
-
-
 // Logout Funktion mit roken überprüfen inkl console.log
 AuthRouter.post("/logout", (req, res) => {
   const authHeader = req.headers['authorization'];
