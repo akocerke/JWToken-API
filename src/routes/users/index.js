@@ -3,6 +3,34 @@ const { StatusCodes } = require("http-status-codes");
 const Users = require("../../database/models/user");
 const UserProfile = require("../../database/models/userProfile");
 const logger = require("../../services/logger");
+const multer = require('multer');
+const path = require('path');
+
+// Multer-Konfiguration für Profilbild-Upload
+const profileImageStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const uploadPath = path.join(__dirname, 'uploads', 'profile_images');
+        cb(null, uploadPath);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+        cb(null, `${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`);
+    }
+});
+
+const profileImageUpload = multer({
+    storage: profileImageStorage,
+    limits: { fileSize: 1024 * 1024 * 5 }, // Beispiel für eine Begrenzung auf 5MB
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Nur Bild-Uploads sind erlaubt!'), false);
+        }
+    }
+});
+
+
 
 const UsersRouter = Router();
 
@@ -108,6 +136,34 @@ UsersRouter.put("/updateprofile", async (req, res) => {
   }
 });
 
+// PUT - Profilbild aktualisieren
+UsersRouter.put('/profile/upload', profileImageUpload.single('profile_image'), async (req, res) => {
+  if (!req.user || !req.user.id) {
+    logger.error('Authentication required: User data missing');
+    return res.status(401).send('Authentication required');
+  }
 
+  if (!req.file) {
+    logger.error('Kein Datei-Upload erhalten');
+    return res.status(400).send('Keine Datei hochgeladen');
+  }
 
+  try {
+    const user = await Users.findByPk(req.user.id);
+    if (!user) {
+      logger.error(`Benutzer nicht gefunden: ID ${req.user.id}`);
+      return res.status(404).send('Benutzer nicht gefunden');
+    }
+
+    // Konstruieren Sie die URL, um das Bild zugänglich zu machen
+    const imagePath = `/uploads/${req.file.filename}`;
+    await user.update({ profile_image_path: imagePath });
+
+    logger.info(`Benutzer ID: ${req.user.id} Profilbild aktualisiert: ${imagePath}`);
+    res.status(200).json();
+  } catch (error) {
+    logger.error(`Fehler beim Aktualisieren des Profilbilds: ${error}`);
+    res.status(500).send('Fehler beim Aktualisieren des Profilbilds');
+  }
+});
 module.exports = { UsersRouter };
