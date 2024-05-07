@@ -1,6 +1,6 @@
 node_modules
 .env
-# Ignorieren von Bildern im profile_images Verzeichnis
-src/routes/users/uploads/profile_images/*.jpg
-# src/routes/users/uploads/profile_images/*.png
-# src/routes/users/uploads/profile_images/*.gif
+# Ignorieren aller Bild-Dateien im profile_images Verzeichnis
+src/routes/users/uploads/profile_images/*
+# Aber behalten Sie den Ordner bei, ignorieren Sie nicht die .gitkeep Datei
+!src/routes/users/uploads/profile_images/.gitkeep
