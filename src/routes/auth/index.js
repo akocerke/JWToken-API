@@ -34,6 +34,7 @@ AuthRouter.post("/login", async (req, res) => {
     const token = generateToken(user);
 
     res.status(StatusCodes.OK).json({ message: "Login erfolgreich", token: token });
+    logger.info(`Benutzer mit der E-Mail: ${email} angemeldet!`)
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Ein Fehler ist aufgetreten", error: error.message });
   }
