@@ -76,7 +76,7 @@ UsersRouter.put("/updateprofile", async (req, res) => {
         city: city,
         postal_code: postalCode
       });
-      logger.info(`Profile updated for user ID: ${req.user.id} Postleitzahl updated to: ${postalCode}`);
+      logger.info(`Profile updated for user ID: ${req.user.id}`);
     } else {
       // Erstelle ein neues Profil, wenn noch keines existiert
       await UserProfile.create({

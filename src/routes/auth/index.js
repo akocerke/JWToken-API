@@ -85,7 +85,8 @@ AuthRouter.post("/logout", (req, res) => {
         return res.sendStatus(403); // Bei ungültigem Token
       }
 
-      console.log(`Logout requested by user ID: ${decoded.id}`); // Hier loggen wir die Benutzer-ID
+      console.log(`Logout erfolgreich User ID: ${decoded.id}`); // Hier loggen wir die Benutzer-ID
+      logger.info(`Logout erfolgreich. User ID: ${decoded.id}`)
       res.status(StatusCodes.OK).json({ message: "Logout erfolgreich. Token gelöscht" });
     });
   } else {
