@@ -1,4 +1,6 @@
 node_modules
 .env
-# Ignorieren des Verzeichnisses profile_images
-src/routes/users/uploads/profile_images/
+# Ignorieren von Bildern im profile_images Verzeichnis
+src/routes/users/uploads/profile_images/*.jpg
+src/routes/users/uploads/profile_images/*.png
+src/routes/users/uploads/profile_images/*.gif
