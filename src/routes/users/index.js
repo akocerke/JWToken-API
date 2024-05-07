@@ -160,7 +160,7 @@ UsersRouter.put('/profile/upload', profileImageUpload.single('profile_image'), a
     await user.update({ profile_image_path: imagePath });
 
     logger.info(`Benutzer ID: ${req.user.id} Profilbild aktualisiert: ${imagePath}`);
-    res.status(200).json();
+    res.status(200).json(`Profilbild aktualisiert: ${imagePath}`);
   } catch (error) {
     logger.error(`Fehler beim Aktualisieren des Profilbilds: ${error}`);
     res.status(500).send('Fehler beim Aktualisieren des Profilbilds');
