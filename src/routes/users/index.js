@@ -5,6 +5,10 @@ const UserProfile = require("../../database/models/userProfile");
 const logger = require("../../services/logger");
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
+const util = require('util');
+const unlink = util.promisify(fs.unlink);
+const url = require('url');
 
 // Multer-Konfiguration für Profilbild-Upload
 const profileImageStorage = multer.diskStorage({
@@ -155,8 +159,20 @@ UsersRouter.put('/profile/upload', profileImageUpload.single('profile_image'), a
       return res.status(404).send('Benutzer nicht gefunden');
     }
 
-    // Konstruieren Sie die URL, um das Bild zugänglich zu machen
-    const imagePath = `/uploads/${req.file.filename}`;
+    // Überprüfe, ob der Pfad eine URL ist
+    if (user.profile_image_path && !user.profile_image_path.startsWith('http')) {
+      const oldImagePath = path.join(__dirname, 'uploads', 'profile_images', path.basename(user.profile_image_path));
+      try {
+        await unlink(oldImagePath);
+        logger.info(`Altes Bild gelöscht: ${oldImagePath}`);
+      } catch (err) {
+        logger.error(`Fehler beim Löschen des alten Bildes: ${err}`);
+        // Optional: Fehler beim Löschen ignorieren und weitermachen
+      }
+    }
+
+    // Neues Bild speichern
+    const imagePath = `/uploads/profile_images/${req.file.filename}`;
     await user.update({ profile_image_path: imagePath });
 
     logger.info(`Benutzer ID: ${req.user.id} Profilbild aktualisiert: ${imagePath}`);
