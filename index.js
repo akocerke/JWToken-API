@@ -16,7 +16,7 @@ app.use(cors());
 
 app.use("/jwtoken", AppRouter);
 
-// Startet den Server und bindet ihn an Port 3000 (falls nicht definiert in .env)
+
 app.use('/uploads', express.static(path.join(__dirname, 'src', 'routes', 'users', 'uploads', 'profile_images')));
 
 // App hört im folgenden auf den Port, welcher über die Umgebungsvariable definiert ist
