@@ -182,4 +182,5 @@ UsersRouter.put('/profile/upload', profileImageUpload.single('profile_image'), a
     res.status(500).send('Fehler beim Aktualisieren des Profilbilds');
   }
 });
+
 module.exports = { UsersRouter };
