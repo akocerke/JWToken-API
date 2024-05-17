@@ -4,3 +4,5 @@ node_modules
 src/routes/users/uploads/profile_images/*
 # Aber behalten Sie den Ordner bei, ignorieren Sie nicht die .gitkeep Datei
 !src/routes/users/uploads/profile_images/.gitkeep
+
+Info.md

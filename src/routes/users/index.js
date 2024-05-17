@@ -9,6 +9,8 @@ const fs = require('fs');
 const util = require('util');
 const unlink = util.promisify(fs.unlink);
 const url = require('url');
+const bcrypt = require('bcrypt');
+
 
 // Multer-Konfiguration für Profilbild-Upload
 const profileImageStorage = multer.diskStorage({
@@ -182,5 +184,82 @@ UsersRouter.put('/profile/upload', profileImageUpload.single('profile_image'), a
     res.status(500).send('Fehler beim Aktualisieren des Profilbilds');
   }
 });
+
+// PUT Passwort ändern
+UsersRouter.put('/updatePassword', async (req, res) => {
+  const userId = req.user.id; // Extrahiere die Benutzer-ID aus dem Token
+  const { oldPassword, newPassword } = req.body;
+
+  try {
+    // Protokolliere die empfangenen Daten
+    logger.info(`Empfangene Daten: userId=${userId}, oldPassword=${oldPassword}, newPassword=${newPassword}`);
+
+    // Finde den Benutzer anhand seiner ID
+    const user = await Users.findByPk(userId);
+
+    // Überprüfe, ob der Benutzer existiert
+    if (!user) {
+      logger.error('Benutzer nicht gefunden');
+      return res.status(404).json({ error: 'Benutzer nicht gefunden' });
+    }
+
+    // Vergleiche das eingegebene alte Passwort mit dem in der Datenbank gespeicherten Passwort
+    const match = await bcrypt.compare(oldPassword, user.password);
+
+    // Überprüfe, ob das alte Passwort korrekt ist
+    if (!match) {
+      logger.error('Altes Passwort ist falsch');
+      return res.status(401).json({ error: 'Altes Passwort ist falsch' });
+    }
+
+    // Hashen des neuen Passworts
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    // Aktualisiere das Passwort des Benutzers in der Datenbank
+    user.password = hashedPassword;
+    await user.save();
+
+    logger.info('Passwort erfolgreich geändert');
+    res.status(200).json({ message: 'Passwort erfolgreich geändert' });
+  } catch (error) {
+    logger.error(`Fehler beim Ändern des Passworts: ${error.message}`);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
+UsersRouter.put('/updateEmail', async (req, res) => {
+  const userId = req.user.id; // Extrahiere die Benutzer-ID aus dem Token
+  const { emailAlt, newEmail } = req.body;
+
+  try {
+    // Finde den Benutzer anhand seiner ID
+    const user = await Users.findByPk(userId);
+
+    if (!user) {
+      logger.error('Benutzer nicht gefunden');
+      return res.status(404).json({ error: 'Benutzer nicht gefunden' });
+    }
+    // Überprüfe, ob die eingegebene alte E-Mail-Adresse korrekt ist
+    if (emailAlt !== user.email) {
+      logger.error('Falsche alte E-Mail-Adresse');
+      return res.status(400).json({ error: 'Falsche alte E-Mail-Adresse' });
+    }
+    // Aktualisiere die E-Mail-Adresse des Benutzers
+    user.email = newEmail;
+    await user.save();
+
+    logger.info('E-Mail-Adresse erfolgreich aktualisiert');
+    res.status(200).json({ message: 'E-Mail-Adresse erfolgreich aktualisiert' });
+  } catch (error) {
+    logger.error(`Fehler beim Aktualisieren der E-Mail-Adresse: ${error.message}`);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+// DELETE /deleteAccount zum Löschen des Benutzerkontos
+// UsersRouter.delete('/deleteAccount', async (req, res) => {
+ 
 
 module.exports = { UsersRouter };
