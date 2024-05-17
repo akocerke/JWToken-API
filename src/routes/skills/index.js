@@ -23,8 +23,6 @@ SkillsRouter.get("/all", async (req, res) => {
     }
 });
 
-
-// GET Anfrage byUserId
 // GET Anfrage byUserId
 SkillsRouter.get("/byUserId/:userId", async (req, res) => {
     try {
