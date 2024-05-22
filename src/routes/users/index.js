@@ -226,8 +226,7 @@ UsersRouter.put('/updatePassword', async (req, res) => {
   }
 });
 
-
-
+// PUT Email Adresse updaten
 UsersRouter.put('/updateEmail', async (req, res) => {
   const userId = req.user.id; // Extrahiere die Benutzer-ID aus dem Token
   const { emailAlt, newEmail } = req.body;
