@@ -24,9 +24,9 @@ SkillsRouter.get("/all", async (req, res) => {
 });
 
 // GET Anfrage byUserId
-SkillsRouter.get("/byUserId/:userId", async (req, res) => {
+SkillsRouter.get("/byUserId", async (req, res) => {
     try {
-        const userId = req.params.userId;
+        const userId = req.user.id;
         const userSkills = await UserSkill.findAll({ where: { user_id: userId } });
         if (userSkills.length === 0) {
             logger.info(`Keine Skills gefunden für Benutzer mit ID ${userId}.`); 

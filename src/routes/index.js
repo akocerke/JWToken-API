@@ -10,6 +10,6 @@ const AppRouter = Router();
 
 AppRouter.use("/auth", AuthRouter);
 AppRouter.use("/users", authMiddleware, UsersRouter);
-AppRouter.use("/skills", SkillsRouter);
+AppRouter.use("/skills",authMiddleware, SkillsRouter);
 
 module.exports = { AppRouter };

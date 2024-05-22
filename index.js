@@ -17,7 +17,7 @@ app.use(cors());
 app.use("/jwtoken", AppRouter);
 
 
-app.use('/uploads', express.static(path.join(__dirname, 'src', 'routes', 'users', 'uploads', 'profile_images')));
+app.use('/uploads/profile_images', express.static(path.join(__dirname, 'src', 'routes', 'users', 'uploads', 'profile_images')));
 
 // App hört im folgenden auf den Port, welcher über die Umgebungsvariable definiert ist
 app.listen(PORT, () => {
